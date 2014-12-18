@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    Your chat id is ${chatId}
+    
 
     <g:form name="client" action="client" >
         <g:hiddenField name="chatId" value="${chatId}" />

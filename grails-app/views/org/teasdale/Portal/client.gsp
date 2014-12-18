@@ -310,10 +310,6 @@
         <g:hiddenField name="serverId" value="${serverId}" />
         <g:hiddenField name="name" value="${name}" />
 
-        <div class="boxed">
-            <h3>Welcome ${name}!</h3>
-        </div>
-
         <div class="boxed" >
             <video id="localVideo" class="videoWindow" autoplay muted></video>
             <video id="remoteVideo" class="videoWindow" autoplay></video>
