@@ -1,0 +1,19 @@
+.boxed {
+    border: 10px;
+    padding: 10px;
+}
+
+#conversationDiv {
+    padding: 10px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: lightgrey;
+
+    height: 100px;
+    overflow: auto;
+}
+
+.videoWindow {
+    background: #222;
+    width: 33%;
+}

@@ -1,0 +1,24 @@
+serial.portname = "COM3"
+serial.baudrate = 19200
+serial.databits = 8
+serial.parity = "none"
+serial.stopbits = 1
+serial.updatefrequency = 16
+serial.maxmissedupdates = 8
+
+commands {
+    blink {
+        name = "BLINK"
+        value = 3000
+    }
+
+    servo01 {
+        name = "SRV1"
+        value = 90
+    }
+
+    servo02 {
+        name = "SRV2"
+        value = 90
+    }
+}
