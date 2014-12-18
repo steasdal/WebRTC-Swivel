@@ -21,8 +21,6 @@
 
             var rtcMessageSubscription;
 
-            var connectButton = $("#connectButton");
-
             var localVideo = $("#localVideo")[0];
             var remoteVideo = $("#remoteVideo")[0];
 
@@ -142,7 +140,12 @@
                 console.log(stream.getVideoTracks()[0]);
 
                 attachMediaStream(localVideo, stream);
-                console.log('Adding local stream.');
+                console.log('Local media stream added.  Initiating session...');
+
+                remoteChatter = serverId;
+                isInitiator = true;
+                sendChatInvitation();
+                console.log('Session initiated');
             }
 
             function handleUserMediaError(error){
@@ -267,14 +270,6 @@
 
             /*************************************************************************************/
 
-            connectButton.click(function() {
-                remoteChatter = serverId;
-                isInitiator = true;
-                sendChatInvitation();
-            });
-
-            /*************************************************************************************/
-
             // Exit neatly on window unload
             $(window).on('beforeunload', function(){
                 // Perchance we happen to be in a video chat, hang up.
@@ -322,10 +317,6 @@
         <div class="boxed" >
             <video id="localVideo" class="videoWindow" autoplay muted></video>
             <video id="remoteVideo" class="videoWindow" autoplay></video>
-        </div>
-
-        <div class="boxed" >
-            <button id="connectButton">Connect</button>
         </div>
 
         <div id="slider-controls" class="content" role="main">

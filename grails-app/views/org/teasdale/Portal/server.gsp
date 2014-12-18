@@ -126,11 +126,12 @@
             }
 
             function prepareForVideoChat() {
-
+                $("#chatterName").val("Now being controlled by " + remoteChatterName);
             }
 
             function cleanupAfterVideoChat() {
                 isInitiator = false;
+                $("#chatterName").val("");
             }
 
             /*************************************************************************************/
@@ -277,6 +278,10 @@
 
         <g:hiddenField name="chatId" value="${chatId}" />
         <g:hiddenField name="name" value="Portal" />
+
+        <div class="boxed" >
+            <input type="text" id="chatterName" readonly style="border:0; color:darkslategrey; font-weight:bold; width: 50%;">
+        </div>
 
         <div class="boxed" >
             <video id="localVideo" class="videoWindow" autoplay muted></video>
