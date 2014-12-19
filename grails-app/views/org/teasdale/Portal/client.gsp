@@ -227,28 +227,37 @@
 
             /*************************************************************************************/
 
+            var panMin = 0;
+            var panMax = 180;
+            var tiltMin = 60;
+            var tiltMax = 105;
+
+            // Pan servo - note that the position value we actually send
+            // is reversed to make the left-right pan direction correct.
             $("#servo01value").val(90);
             $("#servo01-slider").slider({
                 value:90,
-                min: 10,
-                max: 170,
+                min: panMin,
+                max: panMax,
                 animate: true,
                 slide: function( event, ui ) {
                     var slideval = ui.value;
-                    $("#servo01value").val(ui.value);
-                    client.send("/app/servo01", {}, JSON.stringify(slideval));
+                    var reversedval = panMax - slideval;
+                    $("#servo01value").val(slideval);
+                    client.send("/app/servo01", {}, JSON.stringify(reversedval));
                 }
             });
 
+            // Tilt servo
             $("#servo02value").val(90);
             $("#servo02-slider").slider({
                 value:90,
-                min: 80,
-                max: 105,
+                min: tiltMin,
+                max: tiltMax,
                 animate: true,
                 slide: function( event, ui ) {
                     var slideval = ui.value;
-                    $("#servo02value").val(ui.value);
+                    $("#servo02value").val(slideval);
                     client.send("/app/servo02", {}, JSON.stringify(slideval));
                 }
             });
