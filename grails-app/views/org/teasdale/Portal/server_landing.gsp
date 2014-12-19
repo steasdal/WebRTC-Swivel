@@ -3,12 +3,12 @@
 <head>
     <meta name="layout" content="main"/>
     <asset:stylesheet href="chat.css"/>
-    <title>Server Landing Page</title>
+    <title>Host Landing Page</title>
 </head>
 
 <body>
     <br>
-    <H4>You're connecting from localhost... you'll be the portal!</H4>
+    <H4>You're connecting from localhost... you'll be the host!</H4>
     <br>
 
     <g:form name="server" action="server" >

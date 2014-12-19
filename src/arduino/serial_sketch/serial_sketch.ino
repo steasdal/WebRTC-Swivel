@@ -207,7 +207,7 @@ void setup() {
   setupUpdateHandler(initializeCommands);
   setupSerialHandler();
   
-  Serial.begin(19200);
+  Serial.begin(9600);
   
   sendSerialMessage("free SRAM: " + String( freeRam() ));
 }

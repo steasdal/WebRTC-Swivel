@@ -30,7 +30,7 @@ class ChatterService {
     }
 
     boolean serverOnline() {
-        getAllChatters().collect{it.chatId}.contains{Constants.SERVER_CHAT_ID}
+        Constants.SERVER_CHAT_ID in getAllChatters().collect{it.chatId}
     }
 
     boolean readyForChat() {

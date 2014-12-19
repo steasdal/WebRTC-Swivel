@@ -3,7 +3,6 @@ package org.teasdale
 import org.springframework.messaging.Message
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 
@@ -28,11 +27,12 @@ class MessagingService {
             System.out.println exception.getMessage()
         }
 
+        updateRegistrations()
+        updateServerStatus()
+
         if( registrationMessage.chatId == Constants.SERVER_CHAT_ID ) {
             arduinoControllerService.open()
         }
-
-        updateRegistrations()
     }
 
     /**
@@ -49,11 +49,12 @@ class MessagingService {
             System.out.println exception.getMessage()
         }
 
+        updateRegistrations()
+        updateServerStatus()
+
         if( unregistrationMessage.chatId == Constants.SERVER_CHAT_ID ) {
             arduinoControllerService.close()
         }
-
-        updateRegistrations()
     }
 
     /**
@@ -71,6 +72,34 @@ class MessagingService {
             brokerMessagingTemplate.convertAndSend destination, payload
         }
     }
+
+    /**
+     * Force a server status broadcast
+     */
+    @MessageMapping("/status")
+    protected void getServerStatus() {
+        updateServerStatus()
+    }
+
+    /**
+     * Broadcast server status (no server, busy or ready)
+     */
+    private void updateServerStatus() {
+        String destination = "/topic/status"
+        def payload
+
+        if(!chatterService.serverOnline()) {
+            payload = [status: Constants.NO_SERVER]
+        } else if(!chatterService.readyForChat()) {
+            payload = [status: Constants.BUSY]
+        } else {
+            payload = [status: Constants.READY]
+        }
+
+        brokerMessagingTemplate.convertAndSend destination, payload
+    }
+
+    /*********************************************************************************************/
 
     /**
      * Forward a WebRtc message to a particular chatter.

@@ -53,15 +53,6 @@
                             startChat();
                             console.log("Remote chatting with " + remoteChatter);
                             break;
-                        case "chat-acknowledged":        // You've sent a chat offer and the remote participant has acknowledged - prepare to chat!
-                            if( messageBody.sender === remoteChatter ) {
-                                console.log("Chat acknowledged by " + remoteChatter);
-                                prepareForVideoChat();
-                                startChat();
-                            } else {
-                                console.log("Chat acknowledgement expected by " + remoteChatter + " but received by " + messageBody.sender);
-                            }
-                            break;
                         case "disconnect-offer":         // You've received a disconnect offer from your chat participant - prepare to disconnect
                             acknowledgeChatHangup();
                             endChat();
@@ -103,11 +94,6 @@
             function sendMessage(message){
                 console.log('Sending message to ' + remoteChatter + ': ', message);
                 client.send("/app/rtcMessage/" + remoteChatter, {}, JSON.stringify(message));
-            }
-
-            function sendChatInvitation() {
-                var json = {type:'chat-offer', sender:chatId};
-                sendMessage(json);
             }
 
             function acknowledgeChatInvitation() {
@@ -247,10 +233,6 @@
 
                 // Unsubscribe from all channels
                 rtcMessageSubscription.unsubscribe();
-
-                // Tell all chat participants that we're leaving
-                var json = {"senderId": chatId, "message": "-- leaving the chat --"};
-                client.send("/app/public", {}, JSON.stringify(json));
 
                 // Delete this chatter from the Chatter table
                 json = {"chatId": chatId};

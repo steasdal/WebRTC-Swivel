@@ -46,17 +46,9 @@
                     var messageBody = JSON.parse(rawMessage.body);
 
                     switch(messageBody.type) {
-                        case "chat-offer":               // A chat offer has been received from some chat participant - prepare to chat!
-                            remoteChatter = messageBody.sender;
-                            acknowledgeChatInvitation();
-                            prepareForVideoChat();
-                            startChat();
-                            console.log("Remote chatting with " + remoteChatter);
-                            break;
                         case "chat-acknowledged":        // You've sent a chat offer and the remote participant has acknowledged - prepare to chat!
                             if( messageBody.sender === remoteChatter ) {
                                 console.log("Chat acknowledged by " + remoteChatter);
-                                prepareForVideoChat();
                                 startChat();
                             } else {
                                 console.log("Chat acknowledgement expected by " + remoteChatter + " but received by " + messageBody.sender);
@@ -109,11 +101,6 @@
                 sendMessage(json);
             }
 
-            function acknowledgeChatInvitation() {
-                var json = {type:'chat-acknowledged', sender:chatId};
-                sendMessage(json);
-            }
-
             function sendChatHangup() {
                 var json = {type:'disconnect-offer', sender:chatId};
                 sendMessage(json);
@@ -122,10 +109,6 @@
             function acknowledgeChatHangup() {
                 var json = {type:'disconnect-acknowledged', sender:chatId};
                 sendMessage(json);
-            }
-
-            function prepareForVideoChat() {
-
             }
 
             function cleanupAfterVideoChat() {
@@ -142,6 +125,8 @@
                 attachMediaStream(localVideo, stream);
                 console.log('Local media stream added.  Initiating session...');
 
+                // Once the local video stream is obtained, immediately
+                // initiate a video session with the server portal.
                 remoteChatter = serverId;
                 isInitiator = true;
                 sendChatInvitation();
@@ -277,10 +262,6 @@
 
                 // Unsubscribe from all channels
                 rtcMessageSubscription.unsubscribe();
-
-                // Tell all chat participants that we're leaving
-                var json = {"senderId": chatId, "message": "-- leaving the chat --"};
-                client.send("/app/public", {}, JSON.stringify(json));
 
                 // Delete this chatter from the Chatter table
                 json = {"chatId": chatId};
