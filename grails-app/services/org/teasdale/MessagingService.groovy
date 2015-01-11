@@ -22,17 +22,17 @@ class MessagingService {
     @MessageMapping("/register")
     protected void register(RegistrationMessage registrationMessage) {
         try {
-            Chatter chatter = chatterService.newChatter(registrationMessage.name, registrationMessage.chatId)
-        } catch (Exception exception) {
-            System.out.println exception.getMessage()
+            chatterService.newChatter(registrationMessage.name, registrationMessage.chatId)
+
+            if( registrationMessage.chatId == Constants.SERVER_CHAT_ID ) {
+                arduinoControllerService.open()
+            }
+        } catch (exception) {
+            System.out.println "Exception: ${exception.getMessage()}"
         }
 
         updateRegistrations()
         updateServerStatus()
-
-        if( registrationMessage.chatId == Constants.SERVER_CHAT_ID ) {
-            arduinoControllerService.open()
-        }
     }
 
     /**
@@ -45,16 +45,16 @@ class MessagingService {
     protected void unregister(RegistrationMessage unregistrationMessage) {
         try {
             chatterService.deleteChatter(unregistrationMessage.chatId)
-        } catch (Exception exception) {
-            System.out.println exception.getMessage()
+
+            if( unregistrationMessage.chatId == Constants.SERVER_CHAT_ID ) {
+                arduinoControllerService.close()
+            }
+        } catch (exception) {
+            System.out.println "Exception: ${exception.getMessage()}"
         }
 
         updateRegistrations()
         updateServerStatus()
-
-        if( unregistrationMessage.chatId == Constants.SERVER_CHAT_ID ) {
-            arduinoControllerService.close()
-        }
     }
 
     /**

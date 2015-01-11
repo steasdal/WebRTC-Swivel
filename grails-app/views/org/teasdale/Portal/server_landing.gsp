@@ -12,8 +12,6 @@
     <br>
 
     <g:form name="server" action="server" >
-        <g:hiddenField name="chatId" value="${chatId}" />
-
         <fieldset class="buttons">
             <g:submitButton name="server" class="server" value="Connect as Portal"/>
         </fieldset>
