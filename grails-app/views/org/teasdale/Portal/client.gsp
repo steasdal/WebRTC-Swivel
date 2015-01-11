@@ -32,6 +32,10 @@
 
             var rtcConstraints = {video: true, audio:true};
 
+            var gamepadPollIntervalId;
+            var gamepadAxis0position = 0.0;
+            var gamepadAxis1position = 0.0;
+
             // We'll use Google's unofficial public STUN server (NO TURN support!)
             var rtcConfiguration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
 
@@ -261,6 +265,60 @@
                     client.send("/app/servo02", {}, JSON.stringify(slideval));
                 }
             });
+
+            /*************************************************************************************/
+
+            window.addEventListener("gamepadconnected", function(event) {
+                console.log("Gamepad connected: " + event.gamepad.id);
+                gamepadPollIntervalId = setInterval(pollGamepad, 50);
+            });
+
+            window.addEventListener("gamepaddisconnected", function(event) {
+                console.log("Disconnecting gamepad: " + event.gamepad.id);
+                clearInterval(gamepadPollIntervalId);
+            });
+
+            function pollGamepad() {
+                var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+
+                if (!gamepads) {
+                    return;
+                }
+
+                var gamepad = gamepads[0];
+
+                if(gamepad) {
+                    if(gamepad.axes[0] != gamepadAxis0position) {
+                        gamepadAxis0position = gamepad.axes[0];
+                        console.log("gamepad axis 0 position: " + gamepadAxis0position);
+
+                        var panSliderPosition = map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax);
+
+                        $("#servo01-slider").slider('value', panSliderPosition);
+                        $("#servo01value").val(panSliderPosition);
+                    }
+
+                    if(gamepad.axes[1] != gamepadAxis1position) {
+                        gamepadAxis1position = gamepad.axes[1];
+                        console.log("gamepad axis 1 position: " + gamepadAxis1position);
+
+                        var tiltSliderPosition = 0.0;
+
+                        if(gamepadAxis1position <= 0) {
+                            tiltSliderPosition = map_range(gamepadAxis1position, -1.0, 0, tiltMin, 90);
+                        } else {
+                            tiltSliderPosition = map_range(gamepadAxis1position, 0, 1.0, 90, tiltMax);
+                        }
+
+                        $("#servo02-slider").slider('value', tiltSliderPosition);
+                        $("#servo02value").val(tiltSliderPosition);
+                    }
+                }
+            }
+
+            function map_range(value, low1, high1, low2, high2) {
+                return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+            }
 
             /*************************************************************************************/
 
