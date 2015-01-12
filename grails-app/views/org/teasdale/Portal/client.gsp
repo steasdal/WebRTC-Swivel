@@ -300,7 +300,7 @@
                         gamepadAxis0position = gamepad.axes[0];
                         console.log("gamepad axis 0 position: " + gamepadAxis0position);
 
-                        var panSliderPosition = Math.abs(map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax));
+                        var panSliderPosition = Math.round(map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax));
 
                         $("#servo01-slider").slider('value', panSliderPosition);
                         setServo01Position(panSliderPosition);
@@ -313,9 +313,9 @@
                         var tiltSliderPosition = 0.0;
 
                         if(gamepadAxis1position <= 0) {
-                            tiltSliderPosition = Math.abs(map_range(gamepadAxis1position, -1.0, 0, tiltMin, 90));
+                            tiltSliderPosition = Math.round(map_range(gamepadAxis1position, -1.0, 0, tiltMin, 90));
                         } else {
-                            tiltSliderPosition = Math.abs(map_range(gamepadAxis1position, 0, 1.0, 90, tiltMax));
+                            tiltSliderPosition = Math.round(map_range(gamepadAxis1position, 0, 1.0, 90, tiltMax));
                         }
 
                         $("#servo02-slider").slider('value', tiltSliderPosition);
