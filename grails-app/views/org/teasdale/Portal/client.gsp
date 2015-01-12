@@ -246,11 +246,15 @@
                 animate: true,
                 slide: function( event, ui ) {
                     var slideval = ui.value;
-                    var reversedval = panMax - slideval;
-                    $("#servo01value").val(slideval);
-                    client.send("/app/servo01", {}, JSON.stringify(reversedval));
+                    setServo01Position(slideval);
                 }
             });
+
+            function setServo01Position(value) {
+                var reversedval = panMax - value;
+                $("#servo01value").val(value);
+                client.send("/app/servo01", {}, JSON.stringify(reversedval));
+            }
 
             // Tilt servo
             $("#servo02value").val(90);
@@ -261,10 +265,14 @@
                 animate: true,
                 slide: function( event, ui ) {
                     var slideval = ui.value;
-                    $("#servo02value").val(slideval);
-                    client.send("/app/servo02", {}, JSON.stringify(slideval));
+                    setServo02Position(slideval);
                 }
             });
+
+            function setServo02Position(value) {
+                $("#servo02value").val(value);
+                client.send("/app/servo02", {}, JSON.stringify(value));
+            }
 
             /*************************************************************************************/
 
@@ -292,10 +300,10 @@
                         gamepadAxis0position = gamepad.axes[0];
                         console.log("gamepad axis 0 position: " + gamepadAxis0position);
 
-                        var panSliderPosition = map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax);
+                        var panSliderPosition = Math.abs(map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax));
 
                         $("#servo01-slider").slider('value', panSliderPosition);
-                        $("#servo01value").val(panSliderPosition);
+                        setServo01Position(panSliderPosition);
                     }
 
                     if(gamepad.axes[1] != gamepadAxis1position) {
@@ -305,13 +313,13 @@
                         var tiltSliderPosition = 0.0;
 
                         if(gamepadAxis1position <= 0) {
-                            tiltSliderPosition = map_range(gamepadAxis1position, -1.0, 0, tiltMin, 90);
+                            tiltSliderPosition = Math.abs(map_range(gamepadAxis1position, -1.0, 0, tiltMin, 90));
                         } else {
-                            tiltSliderPosition = map_range(gamepadAxis1position, 0, 1.0, 90, tiltMax);
+                            tiltSliderPosition = Math.abs(map_range(gamepadAxis1position, 0, 1.0, 90, tiltMax));
                         }
 
                         $("#servo02-slider").slider('value', tiltSliderPosition);
-                        $("#servo02value").val(tiltSliderPosition);
+                        setServo02Position(tiltSliderPosition);
                     }
                 }
             }
