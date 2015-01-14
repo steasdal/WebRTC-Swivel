@@ -298,7 +298,6 @@
                 if(gamepad) {
                     if(gamepad.axes[0] != gamepadAxis0position) {
                         gamepadAxis0position = gamepad.axes[0];
-                        console.log("gamepad axis 0 position: " + gamepadAxis0position);
 
                         var panSliderPosition = Math.round(map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax));
 
@@ -308,7 +307,6 @@
 
                     if(gamepad.axes[1] != gamepadAxis1position) {
                         gamepadAxis1position = gamepad.axes[1];
-                        console.log("gamepad axis 1 position: " + gamepadAxis1position);
 
                         var tiltSliderPosition = 0.0;
 
