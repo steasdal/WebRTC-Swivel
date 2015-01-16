@@ -13,11 +13,11 @@ Requirements
 Optional
 --------
 *   Custom 3d printed base (see **Base Plate.stl** in the /parts folder)
-*   [Bluefruit EZ-Link Shield](http://www.adafruit.com/products/1588) or [Bluefruit EZ-Link Bluetooth Link & Arduino Programmer](http://www.adafruit.com/products/1588)
+*   [Bluefruit EZ-Link Shield](http://www.adafruit.com/products/1628) or [Bluefruit EZ-Link Bluetooth Link & Arduino Programmer](http://www.adafruit.com/products/1588)
 
 Configuration
 -------------
-Modify the grails-app/conf/ArduinoSerialConfig.txt file and set **serial.portname** to the name of your Arduino's COM port.
+Modify the **grails-app/conf/ArduinoSerialConfig.txt** file and set **serial.portname** to the name of your Arduino's COM port.
 
 Usage
 -----
