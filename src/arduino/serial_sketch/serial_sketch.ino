@@ -53,7 +53,7 @@
     add that function to the setup() function.
  
  If you're having trouble making sense of these instructions, just take a look at how
- it's been implemented in the Blink, Servo and Motor sections below.
+ it's been implemented Servo section below.
 ****************************************************************************************/
 
 #include <Wire.h>
@@ -66,61 +66,6 @@
 #include "util_functions.h"
 #include "serial_handler.h"
 #include "update_handler.h"
-
-/************************************************
- BLINK BLINK BLINK BLINK BLINK BLINK BLINK BLINK 
-************************************************/
-const String BLINK = "BLINK";
-
-int blinkIntervalInit = 250;             // Set blink interval initial value to 250
-int blinkInterval = blinkIntervalInit;   // Set blink interval to its initial value
-
-int led = 13;                            // This is the pin on which we'll be blinking an LED
-int ledState = LOW;                      // The current LED state (LOW or HIGH)
-long previousLedStateChange = 0;         // Stores the last time the LED state changed 
-
-void updateBlinkIntervalInit(int newBlinkIntervalInit) {
-  blinkIntervalInit = newBlinkIntervalInit;
-  sendInitMessage(BLINK, newBlinkIntervalInit);
-}
-
-void setBlinkInterval(int newBlinkInterval) {
-  if( newBlinkInterval <= 0 ) {
-    // If a negative blink value is received, reset to initial value
-    blinkInterval = blinkIntervalInit;
-  } 
-  else {
-    blinkInterval = constrain(newBlinkInterval, 10, 10000);
-    sendUpdateMessage(BLINK, blinkInterval);
-  }
-}
-
-// Check to see if it's time to blink.  This method compares 
-// the current millis to the last time the LED state was changed.
-// If the elapsed number of milliseconds is greater than the
-// blink interval, flip the LED state.
-void checkForBlink() {
-  unsigned long currentMillis = millis();
-
-  if(currentMillis - previousLedStateChange > blinkInterval) {
-    previousLedStateChange = currentMillis;
-    switchLedState();
-    digitalWrite(led, ledState);
-  }
-}
-
-void switchLedState() {
-  if(ledState == LOW) {
-    ledState = HIGH;
-  } 
-  else {
-    ledState = LOW;
-  }
-}
-
-void setupBlink() {
-  pinMode(led, OUTPUT);   
-}
 
 /*******************************************
  SERVOS - SERVOS - SERVOS - SERVOS - SERVOS
@@ -172,7 +117,6 @@ void setupServos() {
  REGISTER INIT HANDLERS - REGISTER INIT HANDLERS
 ************************************************/
 void registerInitHandlers() {
-  registerInitHandler(BLINK, updateBlinkIntervalInit);
   registerInitHandler(SERVO_01, updateServo01Init);
   registerInitHandler(SERVO_02, updateServo02Init);
 }
@@ -181,7 +125,6 @@ void registerInitHandlers() {
  REGISTER COMMAND HANDLERS - REGISTER COMMAND HANDLERS
 ******************************************************/
 void registerCommandHandlers() {
-  registerCommandHandler(BLINK, setBlinkInterval);
   registerCommandHandler(SERVO_01, setServo01);
   registerCommandHandler(SERVO_02, setServo02);
 }
@@ -190,7 +133,6 @@ void registerCommandHandlers() {
  REINITIALIZE COMMANDS - REINITIALIZE COMMANDS
 **********************************************/
 void initializeCommands() {
-  blinkInterval = blinkIntervalInit;
   setServo01(servo01Init);
   setServo02(servo02Init);
 }
@@ -199,7 +141,6 @@ void initializeCommands() {
  SETUP AND MAIN LOOP - SETUP AND MAIN LOOP - SETUP AND MAIN LOOP
 ****************************************************************/
 void setup() {
-  setupBlink();
   setupServos();
   
   registerInitHandlers();
@@ -215,6 +156,5 @@ void setup() {
 void loop() {
   processSerialData();
   checkForUpdateExpiration();
-  checkForBlink();
 }
 

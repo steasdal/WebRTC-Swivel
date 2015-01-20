@@ -54,7 +54,6 @@ class ArduinoControllerService {
         doClose()
     }
 
-    def updateBlink(int interval) { doUpdateCommand("BLINK", interval) }
     def updateServo1(int position) { doUpdateCommand("SRV1", position) }
     def updateServo2(int position) { doUpdateCommand("SRV2", position) }
 

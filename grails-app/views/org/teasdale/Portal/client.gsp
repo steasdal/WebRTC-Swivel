@@ -33,7 +33,10 @@
             var rtcConstraints = {video: true, audio:true};
 
             var servoUpdateIntervalId;
+            var servoUpdatePollFrequency = 63; // poll 16 times a second; 1000/16 = 62.5 so we'll round up to 63 milliseconds
+
             var gamepadPollIntervalId;
+            var gamepadPollFrequency = 50;     // poll 20 times a second; 1000/20 = 50 milliseconds
             var gamepadAxis0position = 0.0;
             var gamepadAxis1position = 0.0;
 
@@ -296,14 +299,14 @@
             }
 
             function startUpdatePolling() {
-                servoUpdateIntervalId = setInterval(sendPositionUpdates, 100);
+                servoUpdateIntervalId = setInterval(sendPositionUpdates, servoUpdatePollFrequency);
             }
 
             /*************************************************************************************/
 
             window.addEventListener("gamepadconnected", function(event) {
                 console.log("Gamepad connected: " + event.gamepad.id);
-                gamepadPollIntervalId = setInterval(pollGamepad, 50);
+                gamepadPollIntervalId = setInterval(pollGamepad, gamepadPollFrequency);
             });
 
             window.addEventListener("gamepaddisconnected", function(event) {
