@@ -32,6 +32,7 @@
 
             var rtcConstraints = {video: true, audio:true};
 
+            var servoUpdateIntervalId;
             var gamepadPollIntervalId;
             var gamepadAxis0position = 0.0;
             var gamepadAxis1position = 0.0;
@@ -90,6 +91,7 @@
                     }
                 });
 
+                startUpdatePolling();
                 startLocalVideo();
             });
 
@@ -236,42 +238,65 @@
             var tiltMin = 60;
             var tiltMax = 105;
 
-            // Pan servo - note that the position value we actually send
-            // is reversed to make the left-right pan direction correct.
+            var panCurrentPosition = 90;
+            var tiltCurrentPosition = 90;
+
+            var panUpdatePosition = 90;
+            var tiltUpdatePosition = 90;
+
+            // Pan servo
             $("#servo01value").val(90);
             $("#servo01-slider").slider({
-                value:90,
+                value:panCurrentPosition,
                 min: panMin,
                 max: panMax,
                 animate: true,
                 slide: function( event, ui ) {
                     var slideval = ui.value;
-                    setServo01Position(slideval);
+                    setPanPosition(slideval);
                 }
             });
-
-            function setServo01Position(value) {
-                var reversedval = panMax - value;
-                $("#servo01value").val(value);
-                client.send("/app/servo01", {}, JSON.stringify(reversedval));
-            }
 
             // Tilt servo
             $("#servo02value").val(90);
             $("#servo02-slider").slider({
-                value:90,
+                value:tiltCurrentPosition,
                 min: tiltMin,
                 max: tiltMax,
                 animate: true,
                 slide: function( event, ui ) {
                     var slideval = ui.value;
-                    setServo02Position(slideval);
+                    setTiltPosition(slideval);
                 }
             });
 
-            function setServo02Position(value) {
+            function setPanPosition(value) {
+                $("#servo01value").val(value);
+
+                // Pan position is reversed to get proper pan direction
+                panUpdatePosition = panMax - value;
+            }
+
+            function setTiltPosition(value) {
                 $("#servo02value").val(value);
-                client.send("/app/servo02", {}, JSON.stringify(value));
+
+                tiltUpdatePosition = value;
+            }
+
+            function sendPositionUpdates() {
+                if(panUpdatePosition != panCurrentPosition) {
+                    panCurrentPosition = panUpdatePosition;
+                    client.send("/app/servo01", {}, JSON.stringify(panCurrentPosition));
+                }
+
+                if(tiltUpdatePosition != tiltCurrentPosition) {
+                    tiltCurrentPosition = tiltUpdatePosition;
+                    client.send("/app/servo02", {}, JSON.stringify(tiltCurrentPosition));
+                }
+            }
+
+            function startUpdatePolling() {
+                servoUpdateIntervalId = setInterval(sendPositionUpdates, 100);
             }
 
             /*************************************************************************************/
@@ -302,7 +327,7 @@
                         var panSliderPosition = Math.round(map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax));
 
                         $("#servo01-slider").slider('value', panSliderPosition);
-                        setServo01Position(panSliderPosition);
+                        setPanPosition(panSliderPosition);
                     }
 
                     if(gamepad.axes[1] != gamepadAxis1position) {
@@ -317,7 +342,7 @@
                         }
 
                         $("#servo02-slider").slider('value', tiltSliderPosition);
-                        setServo02Position(tiltSliderPosition);
+                        setTiltPosition(tiltSliderPosition);
                     }
                 }
             }
@@ -332,6 +357,9 @@
             $(window).on('beforeunload', function(){
                 // Perchance we happen to be in a video chat, hang up.
                 tryHangup();
+
+                // Stop polling for updates
+                clearInterval(servoUpdateIntervalId);
 
                 // Unsubscribe from all channels
                 rtcMessageSubscription.unsubscribe();
