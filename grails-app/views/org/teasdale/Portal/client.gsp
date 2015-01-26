@@ -39,6 +39,7 @@
             var gamepadPollFrequency = 50;     // poll 20 times a second; 1000/20 = 50 milliseconds
             var gamepadAxis0position = 0.0;
             var gamepadAxis1position = 0.0;
+            var gamepadButton10value = 0.0;
 
             // We'll use Google's unofficial public STUN server (NO TURN support!)
             var rtcConfiguration = {'iceServers': [{'url': 'stun:stun.l.google.com:19302'}]};
@@ -238,11 +239,14 @@
 
             var panMin = 0;
             var panMax = 180;
+            var panHome = 90;
+
             var tiltMin = 60;
             var tiltMax = 105;
+            var tiltHome = 90;
 
-            var panCurrentPosition = 90;
-            var tiltCurrentPosition = 90;
+            var panCurrentPosition = panHome;
+            var tiltCurrentPosition = tiltHome;
 
             var panUpdatePosition = 90;
             var tiltUpdatePosition = 90;
@@ -275,21 +279,18 @@
 
             function setPanPosition(value) {
                 $("#servo01value").val(value);
-
-                // Pan position is reversed to get proper pan direction
-                panUpdatePosition = panMax - value;
+                panUpdatePosition = value;
             }
 
             function setTiltPosition(value) {
                 $("#servo02value").val(value);
-
                 tiltUpdatePosition = value;
             }
 
             function sendPositionUpdates() {
                 if(panUpdatePosition != panCurrentPosition) {
                     panCurrentPosition = panUpdatePosition;
-                    client.send("/app/servo01", {}, JSON.stringify(panCurrentPosition));
+                    client.send("/app/servo01", {}, JSON.stringify(panMax - panCurrentPosition));
                 }
 
                 if(tiltUpdatePosition != tiltCurrentPosition) {
@@ -324,24 +325,39 @@
                 var gamepad = gamepads[0];
 
                 if(gamepad) {
-                    if(gamepad.axes[0] != gamepadAxis0position) {
-                        gamepadAxis0position = gamepad.axes[0];
+                    if(gamepad.buttons[10].value != gamepadButton10value) {
+                        gamepadButton10value = gamepad.buttons[10].value;
+                        console.log("Gamepad Button 10 Value: " +  gamepadButton10value);
 
-                        var panSliderPosition = Math.round(map_range(gamepadAxis0position, -1.0, 1.0, panMin, panMax));
+                        $("#servo01-slider").slider('value', panHome);
+                        setPanPosition(panHome);
+
+                        $("#servo02-slider").slider('value', tiltHome);
+                        setTiltPosition(tiltHome);
+                    }
+
+                    var panIncrement = Math.round(map_range(gamepad.axes[0], -1.0, 1.0, -5, 5));
+                    var panSliderPosition = panCurrentPosition;
+
+                    if( panIncrement ) {
+                        if( panIncrement > 0 ) {
+                            panSliderPosition = Math.min(panMax, panCurrentPosition + panIncrement);
+                        } else if( panIncrement < 0 ) {
+                            panSliderPosition = Math.max(panMin, panCurrentPosition + panIncrement);
+                        }
 
                         $("#servo01-slider").slider('value', panSliderPosition);
                         setPanPosition(panSliderPosition);
                     }
 
-                    if(gamepad.axes[1] != gamepadAxis1position) {
-                        gamepadAxis1position = gamepad.axes[1];
+                    var tiltIncrement = Math.round(map_range(gamepad.axes[1], -1.0, 1.0, -3, 3));
+                    var tiltSliderPosition = tiltCurrentPosition;
 
-                        var tiltSliderPosition = 0.0;
-
-                        if(gamepadAxis1position <= 0) {
-                            tiltSliderPosition = Math.round(map_range(gamepadAxis1position, -1.0, 0, tiltMin, 90));
-                        } else {
-                            tiltSliderPosition = Math.round(map_range(gamepadAxis1position, 0, 1.0, 90, tiltMax));
+                    if( tiltIncrement ) {
+                        if( tiltIncrement > 0 ) {
+                            tiltSliderPosition = Math.min(tiltMax, tiltCurrentPosition + tiltIncrement);
+                        } else if( tiltIncrement < 0 ) {
+                            tiltSliderPosition = Math.max(tiltMin, tiltCurrentPosition + tiltIncrement);
                         }
 
                         $("#servo02-slider").slider('value', tiltSliderPosition);
