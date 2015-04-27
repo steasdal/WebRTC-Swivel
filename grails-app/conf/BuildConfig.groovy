@@ -22,6 +22,14 @@ grails.project.fork = [
 
 grails.project.dependency.resolver = "maven" // or ivy
 
+System.properties.putAll(
+        [
+                "http.proxyHost":"cache2.lexmark.com",
+                "http.proxyPort":"80",
+                "http.nonProxyHosts":"localhost|*.lexmark.com|*.pvi.com"
+        ]
+)
+
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {

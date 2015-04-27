@@ -2,7 +2,7 @@
 
 <html>
 <head>
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="spartan"/>
 
     <asset:javascript src="jquery" />
     <asset:javascript src="spring-websocket" />
@@ -18,6 +18,7 @@
             var client = Stomp.over(socket);
 
             var rtcMessageSubscription;
+            var pokeMessageSubscription;
 
             var localVideo = $("#localVideo")[0];
             var remoteVideo = $("#remoteVideo")[0];
@@ -39,6 +40,12 @@
                 // Register the existence of this new chat client with the server
                 var json = {"name": name, "chatId": chatId};
                 client.send("/app/register", {}, JSON.stringify(json));
+
+                // Subscribe to the poke channel
+                pokeMessageSubscription = client.subscribe("/topic/poke", function(rawMessage) {
+                    var messageBody = JSON.parse(rawMessage.body);
+                    console.log("poke message: " + messageBody.message);
+                });
 
                 // Subscribe to my own private channel for WebRTC messages
                 rtcMessageSubscription = client.subscribe("/topic/rtcMessage/" + chatId, function(rawMessage) {
@@ -87,6 +94,7 @@
                 });
 
                 startLocalVideo();
+                enableScreenSaver();
             });
 
             /*************************************************************************************/
@@ -148,6 +156,8 @@
                     if (isInitiator) {
                         doCall();
                     }
+
+                    disableScreenSaver();
                 }
             }
 
@@ -157,6 +167,8 @@
                     rtcPeerConnection.close();
                     rtcPeerConnection = null;
                     remoteStream = null;
+
+                    enableScreenSaver();
                 }
             }
 
@@ -226,6 +238,107 @@
 
             /*************************************************************************************/
 
+            var interval;
+
+            var canvas = $("#canvas").get(0);
+            var ctx = canvas.getContext("2d");
+
+            var W = window.innerWidth, H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+
+            var particles = [];
+            for(var i = 0; i < 25; i++)
+            {
+                particles.push(new particle());
+            }
+
+            function particle()
+            {
+                //location on the canvas
+                this.location = {x: Math.random()*W, y: Math.random()*H};
+                //radius - lets make this 0
+                this.radius = 0;
+                //speed
+                this.speed = 3;
+                //steering angle in degrees range = 0 to 360
+                this.angle = Math.random()*360;
+                //colors
+                var r = Math.round(Math.random()*255);
+                var g = Math.round(Math.random()*255);
+                var b = Math.round(Math.random()*255);
+                var a = Math.random();
+                this.rgba = "rgba("+r+", "+g+", "+b+", "+a+")";
+            }
+
+            function draw()
+            {
+                //re-paint the BG
+                //Lets fill the canvas black
+                //reduce opacity of bg fill.
+                //blending time
+                ctx.globalCompositeOperation = "source-over";
+                ctx.fillStyle = "rgba(0, 0, 0, 0.02)";
+                ctx.fillRect(0, 0, W, H);
+                ctx.globalCompositeOperation = "lighter";
+
+                for(var i = 0; i < particles.length; i++)
+                {
+                    var p = particles[i];
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(p.location.x, p.location.y, p.radius, p.radius);
+
+                    //Lets move the particles
+                    //So we basically created a set of particles moving in random direction
+                    //at the same speed
+                    //Time to add ribbon effect
+                    for(var n = 0; n < particles.length; n++)
+                    {
+                        var p2 = particles[n];
+                        //calculating distance of particle with all other particles
+                        var yd = p2.location.y - p.location.y;
+                        var xd = p2.location.x - p.location.x;
+                        var distance = Math.sqrt(xd*xd + yd*yd);
+                        //draw a line between both particles if they are in 200px range
+                        if(distance < 200)
+                        {
+                            ctx.beginPath();
+                            ctx.lineWidth = 1;
+                            ctx.moveTo(p.location.x, p.location.y);
+                            ctx.lineTo(p2.location.x, p2.location.y);
+                            ctx.strokeStyle = p.rgba;
+                            ctx.stroke();
+                            //The ribbons appear now.
+                        }
+                    }
+
+                    //We are using simple vectors here
+                    //New x = old x + speed * cos(angle)
+                    p.location.x = p.location.x + p.speed*Math.cos(p.angle*Math.PI/180);
+                    //New y = old y + speed * sin(angle)
+                    p.location.y = p.location.y + p.speed*Math.sin(p.angle*Math.PI/180);
+                    //You can read about vectors here:
+                    //http://physics.about.com/od/mathematics/a/VectorMath.htm
+
+                    if(p.location.x < 0) p.location.x = W;
+                    if(p.location.x > W) p.location.x = 0;
+                    if(p.location.y < 0) p.location.y = H;
+                    if(p.location.y > H) p.location.y = 0;
+                }
+            }
+
+            function enableScreenSaver() {
+                $("#canvas").show();
+                interval = setInterval(draw,30);
+            }
+
+            function disableScreenSaver() {
+                clearInterval(interval);
+                $("#canvas").hide();
+            }
+
+            /*************************************************************************************/
+
             // Exit neatly on window unload
             $(window).on('beforeunload', function(){
                 // Perchance we happen to be in a video chat, hang up.
@@ -233,6 +346,7 @@
 
                 // Unsubscribe from all channels
                 rtcMessageSubscription.unsubscribe();
+                pokeMessageSubscription.unsubscribe();
 
                 // Delete this chatter from the Chatter table
                 json = {"chatId": chatId};
@@ -249,25 +363,19 @@
         });
     </script>
 </head>
-    <body>
-        <div class="nav" role="navigation">
-            <ul>
-                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-            </ul>
-        </div>
-
-        <br/>
-
+    <body class="serverBody">
         <g:hiddenField name="chatId" value="${chatId}" />
         <g:hiddenField name="name" value="Portal" />
 
-        <div class="boxed" >
+        <canvas id="canvas"></canvas>
+
+        <div class="statusBox" >
             <input type="text" id="chatterName" readonly style="border:0; color:darkslategrey; font-weight:bold; width: 50%;">
         </div>
 
         <div class="boxed" >
-            <video id="localVideo" class="videoWindow" autoplay muted></video>
-            <video id="remoteVideo" class="videoWindow" autoplay></video>
+            <video id="localVideo" class="serverLocalVideoWindow" autoplay muted></video>
+            <video id="remoteVideo" class="serverRemotevideoWindow" autoplay></video>
         </div>
     </body>
 </html>

@@ -277,6 +277,11 @@
                 }
             });
 
+            $("#pokeButton").button().click(function( event ) {
+                var json = {message:'poke from client!'};
+                client.send("/app/poke", {}, JSON.stringify(json));
+            });
+
             function setPanPosition(value) {
                 $("#servo01value").val(value);
                 panUpdatePosition = value;
@@ -426,6 +431,10 @@
             <label for="servo02value">Tilt:</label>
             <input type="text" id="servo02value" readonly style="border:0; color:#f6931f; font-weight:bold;">
             <div id="servo02-slider"></div>
+
+            <br>
+
+            <button id="pokeButton">poke</button>
         </div>
 
     </body>
