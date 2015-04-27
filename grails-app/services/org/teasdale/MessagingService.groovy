@@ -131,16 +131,4 @@ class MessagingService {
     protected void setServo02(String position) {
         arduinoControllerService.updateServo2( Integer.parseInt(position) )
     }
-
-    /*********************************************************************************************/
-
-    @MessageMapping("/poke")
-    protected void pokeMessage(Message message) {
-
-        System.out.println "passing along a poke message"
-
-        String destination = "/topic/poke"
-        brokerMessagingTemplate.send destination, message
-    }
-
 }

@@ -2,7 +2,7 @@
 
 <html>
 <head>
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="spartan"/>
 
     <asset:javascript src="jquery" />
     <asset:javascript src="spring-websocket" />
@@ -237,8 +237,8 @@
 
             /*************************************************************************************/
 
-            var panMin = 0;
-            var panMax = 180;
+            var panMin = 15;
+            var panMax = 165;
             var panHome = 90;
 
             var tiltMin = 60;
@@ -254,7 +254,7 @@
             // Pan servo
             $("#servo01value").val(90);
             $("#servo01-slider").slider({
-                value:panCurrentPosition,
+                value: panCurrentPosition,
                 min: panMin,
                 max: panMax,
                 animate: true,
@@ -267,7 +267,8 @@
             // Tilt servo
             $("#servo02value").val(90);
             $("#servo02-slider").slider({
-                value:tiltCurrentPosition,
+                orientation: "vertical",
+                value: tiltCurrentPosition,
                 min: tiltMin,
                 max: tiltMax,
                 animate: true,
@@ -275,11 +276,6 @@
                     var slideval = ui.value;
                     setTiltPosition(slideval);
                 }
-            });
-
-            $("#pokeButton").button().click(function( event ) {
-                var json = {message:'poke from client!'};
-                client.send("/app/poke", {}, JSON.stringify(json));
             });
 
             function setPanPosition(value) {
@@ -403,39 +399,24 @@
         });
     </script>
 </head>
-    <body>
-        <div class="nav" role="navigation">
-            <ul>
-                <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-            </ul>
-        </div>
-
-        <br/>
-
+    <body class="videoBody">
         <g:hiddenField name="chatId" value="${chatId}" />
         <g:hiddenField name="serverId" value="${serverId}" />
         <g:hiddenField name="name" value="${name}" />
 
-        <div class="boxed" >
-            <video id="localVideo" class="videoWindow" autoplay muted></video>
-            <video id="remoteVideo" class="videoWindow" autoplay></video>
-        </div>
+        <video id="localVideo" class="localVideoWindow" autoplay muted></video>
+        <video id="remoteVideo" class="remotevideoWindow" autoplay></video>
 
-        <div id="slider-controls" class="content" role="main">
-            <label for="servo01value">Pan:</label>
-            <input type="text" id="servo01value" readonly style="border:0; color:#f6931f; font-weight:bold;">
-            <div id="servo01-slider"></div>
-
-            <br>
-
-            <label for="servo02value">Tilt:</label>
-            <input type="text" id="servo02value" readonly style="border:0; color:#f6931f; font-weight:bold;">
+        <div id="tilt-slider-control" >
+            <label class="sliderLabel" for="servo02value">tilt:</label>
+            <input class="sliderText" type="text" id="servo02value" readonly />
             <div id="servo02-slider"></div>
-
-            <br>
-
-            <button id="pokeButton">poke</button>
         </div>
 
+        <div id="pan-slider-control" >
+            <label class="sliderLabel" for="servo01value">pan:</label>
+            <input class="sliderText" type="text" id="servo01value" readonly />
+            <div id="servo01-slider"></div>
+        </div>
     </body>
 </html>

@@ -18,7 +18,6 @@
             var client = Stomp.over(socket);
 
             var rtcMessageSubscription;
-            var pokeMessageSubscription;
 
             var localVideo = $("#localVideo")[0];
             var remoteVideo = $("#remoteVideo")[0];
@@ -40,12 +39,6 @@
                 // Register the existence of this new chat client with the server
                 var json = {"name": name, "chatId": chatId};
                 client.send("/app/register", {}, JSON.stringify(json));
-
-                // Subscribe to the poke channel
-                pokeMessageSubscription = client.subscribe("/topic/poke", function(rawMessage) {
-                    var messageBody = JSON.parse(rawMessage.body);
-                    console.log("poke message: " + messageBody.message);
-                });
 
                 // Subscribe to my own private channel for WebRTC messages
                 rtcMessageSubscription = client.subscribe("/topic/rtcMessage/" + chatId, function(rawMessage) {
@@ -120,7 +113,7 @@
             }
 
             function prepareForVideoChat() {
-                $("#chatterName").val("Now being controlled by " + remoteChatterName);
+                $("#chatterName").val("chatting with " + remoteChatterName);
             }
 
             function cleanupAfterVideoChat() {
@@ -346,7 +339,6 @@
 
                 // Unsubscribe from all channels
                 rtcMessageSubscription.unsubscribe();
-                pokeMessageSubscription.unsubscribe();
 
                 // Delete this chatter from the Chatter table
                 json = {"chatId": chatId};
@@ -363,19 +355,15 @@
         });
     </script>
 </head>
-    <body class="serverBody">
+    <body class="videoBody">
         <g:hiddenField name="chatId" value="${chatId}" />
         <g:hiddenField name="name" value="Portal" />
 
         <canvas id="canvas"></canvas>
 
-        <div class="statusBox" >
-            <input type="text" id="chatterName" readonly style="border:0; color:darkslategrey; font-weight:bold; width: 50%;">
-        </div>
+        <input class="statusText" type="text" id="chatterName" readonly />
 
-        <div class="boxed" >
-            <video id="localVideo" class="serverLocalVideoWindow" autoplay muted></video>
-            <video id="remoteVideo" class="serverRemotevideoWindow" autoplay></video>
-        </div>
+        <video id="localVideo" class="localVideoWindow" autoplay muted></video>
+        <video id="remoteVideo" class="remotevideoWindow" autoplay></video>
     </body>
 </html>

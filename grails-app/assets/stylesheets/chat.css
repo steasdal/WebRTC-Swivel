@@ -3,30 +3,13 @@
     padding: 10px;
 }
 
-.videoWindow {
-    background: #222;
-    width: 33%;
-}
+/* ******** Shared ******** */
 
-.serverBody {
+.videoBody {
     background: black;
 }
 
-.statusBox {
-    background: transparent;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-}
-
-#chatterName {
-    background: transparent;
-    width: 50%;
-    font-weight: bold;
-    border: 0;
-}
-
-.serverRemotevideoWindow {
+.remotevideoWindow {
     position: absolute;
     background: black;
     top: 0px;
@@ -36,7 +19,7 @@
     z-index: -1;
 }
 
-.serverLocalVideoWindow {
+.localVideoWindow {
     position: absolute;
     background: black;
     right: 0px;
@@ -45,16 +28,70 @@
     z-index: 1;
 }
 
-#statusMessage {
+/* ******** Server ******** */
+
+.statusText {
+    background: transparent;
+    color: orange;
+    top: 10px;
+    left: 10px;
+    right: 10px;
     border: 0;
-    color: darkred;
+    font-weight: bold;
+}
+
+#chatterName {
+    background: transparent;
+    width: 50%;
+    font-weight: bold;
+    border: 0;
 }
 
 #canvas {
     position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     height: 100%;
     width: 100%;
     display: none;
     background: #000;
     z-index: 1000;
+}
+
+/* ******** Client ******** */
+
+.sliderLabel {
+    background: transparent;
+    color: orange;
+    font-family: "Bookman", Georgia, "Times New Roman", serif;
+}
+
+.sliderText {
+    background: transparent;
+    color: orange;
+    font-family: "Bookman", Georgia, "Times New Roman", serif;
+    border: 0;
+}
+
+#tilt-slider-control {
+    background: transparent;
+    position: absolute;
+    bottom: 50px;
+    left: 10px;
+}
+
+#pan-slider-control {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 78%;
+}
+
+/* ******** Client Landing ******** */
+
+#statusMessage {
+    border: 0;
+    color: darkred;
 }
