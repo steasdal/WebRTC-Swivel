@@ -9,6 +9,7 @@ Requirements
 *  [Arduino Uno](http://www.adafruit.com/products/50)
 *  [Adafruit Servo Shield](http://www.adafruit.com/products/1411)
 *  [Robot Geek Pan/Tilt Kit](http://www.trossenrobotics.com/robotgeek-pantilt.aspx)
+*  [WinBook TW700 Windows 8.1 Tablet](http://www.microcenter.com/product/439773/TW70CA17_Tablet_-_Black)
 
 Optional
 --------
@@ -22,3 +23,7 @@ Modify the **grails-app/conf/ArduinoSerialConfig.txt** file and set **serial.por
 Usage
 -----
 Simply run **grails run-app** or, better yet, **grails run-app -https** and navigate the the resulting URL.
+
+Images
+------
+![Completed, working portal awaiting WebRTC connection from client](/completed_portal.png)
